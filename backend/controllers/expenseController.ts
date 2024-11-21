@@ -132,3 +132,30 @@ export const getTransactionById = async (req: Request, res: Response): Promise<R
         return res.status(500).json({ message: "Error retrieving transaction", error: error.message });
     }
 };
+
+
+export const deleteExpense = async (req: Request, res: Response) => {
+    const { transactionId } = req.query;
+  
+    if (!transactionId) {
+      return res.status(400).json({ message: "Transaction ID is required in the query parameters." });
+    }
+  
+    try {
+      // Find and update the expense by removing the specific transaction
+      const result = await Expense.updateOne(
+        { "transactions._id": transactionId }, // Match document containing the transaction
+        { $pull: { transactions: { _id: transactionId } } } // Remove the transaction from the array
+      );
+  
+      if (result.modifiedCount === 0) {
+        // No transaction found or removed
+        return res.status(404).json({ message: "Transaction not found." });
+      }
+  
+      return res.status(200).json({ message: "Transaction deleted successfully." });
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      return res.status(500).json({ message: "Internal server error." });
+    }
+  };

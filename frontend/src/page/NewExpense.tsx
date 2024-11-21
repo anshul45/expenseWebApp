@@ -2,20 +2,19 @@ import { ActionIcon, Box, Flex, TextInput, Title, Select, NumberInput, Center, T
 import { IconArrowLeftDashed, IconFileDescription, IconCurrencyRupee, IconEqual, IconEqualNot } from "@tabler/icons-react";
 import SplitExpenseEqually from "../components/SplitExpenseEqually";
 import SplitExpenseUnequally from "../components/SplitExpenseUnequally";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getSingleTransaction,  } from "../api/apiRequest";
 
 const NewExpense = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [openEqually, setOpenEqually] = useState<boolean>(false);
   const [openUnequally, setOpenUnequally] = useState<boolean>(false);
   const [expense, setExpense] = useState<any>(null); 
   const [desc, setDesc] = useState<string>("");
   const [amount, setAmount] = useState<number | undefined>();
-  const [paidBy, setPaidBy] = useState<string[]>(["you"]);
-  const { selectedFriends } = location.state || {};
+  const [paidBy, setPaidBy] = useState<string>("you");
+  const [paidTo, setPaidTo] = useState<string[]>([]);
   const { id } = useParams();
 
   const fetchExpense = async (id: string) => {
@@ -24,41 +23,27 @@ const NewExpense = () => {
       setExpense(data);
       setDesc(data.transaction.desc || "");
       setAmount(data.transaction.amount || undefined);
-      setPaidBy([data.transaction.paidBy]);
+      setPaidTo(data.transaction.paidTo.map((user: any) => user.name));
     }
   };
+
+
 
   
 
   useEffect(() => {
-    if (selectedFriends) {
-      setPaidBy((prev) =>
-        Array.from(new Set([...prev, ...selectedFriends.map((friend: string) => String(friend))]))
-      );
-    }
-
+    if(expense) setPaidBy(expense.transaction.paidBy);
     if (id) {
-      // Edit mode: Fetch the existing expense
       fetchExpense(id);
-    } else {
-      // Create mode: Reset fields
-      setExpense(null);
-      setDesc("");
-      setAmount(undefined);
-      setPaidBy(["you"]);
     }
-  }, [selectedFriends, id]);
+  }, [id]);
 
-  const handleSave = async () => {
-    // if (id) {updateExpense
-    //   // Update existing expense
-    //   await updateExpense(id, { desc, amount, paidBy });
-    // } else {
-    //   // Create new expense
-    //   await createExpense({ desc, amount, paidBy });
-    // }
-    navigate("/"); // Navigate back to home or expenses list
-  };
+  useEffect(() => {
+    if (expense?.transaction?.paidBy) {
+      setPaidBy(expense.transaction.paidBy);
+    }
+  }, [expense?.transaction?.paidBy,paidBy]);
+
 
   return (
     <Box bg="yellow" px={40} py={15} w="100%">
@@ -93,8 +78,15 @@ const NewExpense = () => {
           />
         </Flex>
         <Center>
+     
           <Text pr={10}>Paid by</Text>
-          <Select w={170} data={paidBy} defaultValue="you" />
+            <Select 
+              w={170} 
+              value={paidBy} // use paidBy state for value
+              data={paidTo} // populate data from paidTo array
+              onChange={setPaidBy} // update paidBy state on change
+              />
+             
         </Center>
         <Center>
           <Title size={25}>How to Split</Title>
@@ -127,9 +119,9 @@ const NewExpense = () => {
             <Text>Unequally</Text>
           </Flex>
         </Flex>
-        {openEqually && <SplitExpenseEqually amount={amount} user={paidBy} />}
-        {openUnequally && <SplitExpenseUnequally amount={amount} user={paidBy} />}
-        <Button variant="default" w={450} onClick={handleSave}>
+        {openEqually && <SplitExpenseEqually amount={amount} user={paidTo} />}
+        {openUnequally && <SplitExpenseUnequally amount={amount} user={expense?.transaction.paidTo} />}
+        <Button variant="default" w={450}>
           Save
         </Button>
       </Flex>

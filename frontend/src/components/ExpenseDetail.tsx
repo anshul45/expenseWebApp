@@ -13,6 +13,8 @@ const ExpenseDetail = ({open, setOpen,data}:{open:boolean,setOpen: (value: boole
     setOpen(false)
   }
 
+  console.log(data)
+
 
   
 
