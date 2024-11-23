@@ -1,62 +1,127 @@
-import { ActionIcon, Box, Flex, TextInput, Title, Select, NumberInput, Center, Text, Button } from "@mantine/core";
-import { IconArrowLeftDashed, IconFileDescription, IconCurrencyRupee, IconEqual, IconEqualNot } from "@tabler/icons-react";
+import {
+  ActionIcon,
+  Box,
+  Flex,
+  TextInput,
+  Title,
+  Select,
+  NumberInput,
+  Center,
+  Text,
+  Button,
+} from "@mantine/core";
+import {
+  IconArrowLeftDashed,
+  IconFileDescription,
+  IconCurrencyRupee,
+  IconEqual,
+  IconEqualNot,
+} from "@tabler/icons-react";
 import SplitExpenseEqually from "../components/SplitExpenseEqually";
 import SplitExpenseUnequally from "../components/SplitExpenseUnequally";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getSingleTransaction,  } from "../api/apiRequest";
+import { getSingleTransaction, getUserExpense, addExpense, editExpense } from "../api/apiRequest";
 
 const NewExpense = () => {
   const navigate = useNavigate();
+  const { transactionId, userId } = useParams();
+
   const [openEqually, setOpenEqually] = useState<boolean>(false);
   const [openUnequally, setOpenUnequally] = useState<boolean>(false);
-  const [expense, setExpense] = useState<any>(null); 
+
+  const [loading, setLoading] = useState<boolean>(false); // To track save state
+  const [expense, setExpense] = useState<any>(null);
   const [desc, setDesc] = useState<string>("");
   const [amount, setAmount] = useState<number | undefined>();
   const [paidBy, setPaidBy] = useState<string>("you");
   const [paidTo, setPaidTo] = useState<string[]>([]);
-  const { id } = useParams();
+  const [paidToUser, setPaidToUser] = useState([]);
 
-  const fetchExpense = async (id: string) => {
-    const data = await getSingleTransaction(id);
-    if (data) {
-      setExpense(data);
-      setDesc(data.transaction.desc || "");
-      setAmount(data.transaction.amount || undefined);
-      setPaidTo(data.transaction.paidTo.map((user: any) => user.name));
+  // Fetch user expense by ID
+  const fetchUserExpense = async (userId: string) => {
+    try {
+      const data = await getUserExpense(userId);
+      if (data) {
+        setExpense(data);
+        setPaidTo(data.users || []);
+      }
+    } catch (error) {
+      console.error("Error fetching user expense:", error);
+    }
+  };
+
+ 
+
+  // Fetch transaction details by ID
+  const fetchTransaction = async (transactionId: string) => {
+    try {
+      const data = await getSingleTransaction(transactionId);
+      if (data) {
+        setExpense(data);
+        setDesc(data.transaction.desc || "");
+        setAmount(data.transaction.amount || undefined);
+        setPaidTo(data.users || []);
+        setPaidBy(data.transaction.paidBy || "you");
+      }
+    } catch (error) {
+      console.error("Error fetching transaction:", error);
+    }
+  };
+
+  // Save expense details
+  const saveExpense = async () => {
+    if (!desc || !amount || !paidBy ||!paidToUser) {
+      alert("Please fill in all fields before saving.");
+      return;
+    }
+    setLoading(true);
+    try {
+      if(userId){
+        await addExpense(expense._id, desc, amount, paidBy,paidToUser);
+      }
+      else if(transactionId)
+      {
+        await editExpense(transactionId,desc,amount,paidBy,paidToUser)
+      }
+      navigate(`/expense/${expense._id}`);
+    } catch (error) {
+      console.error("Error saving expense:", error);
+      alert("Failed to save expense. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
 
-
-  
-
   useEffect(() => {
-    if(expense) setPaidBy(expense.transaction.paidBy);
-    if (id) {
-      fetchExpense(id);
+    if (transactionId) {
+      fetchTransaction(transactionId);
+    } else if (userId) {
+      fetchUserExpense(userId);
     }
-  }, [id]);
-
-  useEffect(() => {
-    if (expense?.transaction?.paidBy) {
-      setPaidBy(expense.transaction.paidBy);
-    }
-  }, [expense?.transaction?.paidBy,paidBy]);
+  }, [transactionId, userId]);
 
 
   return (
-    <Box bg="yellow" px={40} py={15} w="100%">
+    <Box px={40} py={15} w="100%">
       <Flex gap={10} mb={40} align="center">
-        <ActionIcon bg="yellow" onClick={() => navigate(id ? `/expense/${expense._id}` : "/")}>
+        <ActionIcon
+          onClick={() =>
+            navigate(transactionId ? `/expense/${expense?._id}` : "/")
+          }
+        >
           <IconArrowLeftDashed />
         </ActionIcon>
-        <Title size={20}>{id ? "Edit Expense" : "New Expense"}</Title>
+        <Title size={20}>{transactionId ? "Edit Expense" : "New Expense"}</Title>
       </Flex>
+
       <Center>
-        <Text>{id ? `With you & ${expense?.name}` : "With you & selected friends"}</Text>
+        <Text>{`With you & ${expense?.name}`}</Text>
       </Center>
+
       <Flex mt={8} gap={10} justify="center" align="center" direction="column">
+        {/* Description Input */}
         <Flex align="center">
           <IconFileDescription />
           <TextInput
@@ -65,8 +130,9 @@ const NewExpense = () => {
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
           />
-         
         </Flex>
+
+        {/* Amount Input */}
         <Flex align="center">
           <IconCurrencyRupee />
           <NumberInput
@@ -77,17 +143,20 @@ const NewExpense = () => {
             hideControls
           />
         </Flex>
+
+        {/* Paid By Selector */}
         <Center>
-     
           <Text pr={10}>Paid by</Text>
-            <Select 
-              w={170} 
-              value={paidBy} // use paidBy state for value
-              data={paidTo} // populate data from paidTo array
-              onChange={setPaidBy} // update paidBy state on change
-              />
-             
+          <Select
+            w={170}
+            value={paidBy}
+            data={paidTo}
+            onChange={setPaidBy}
+            placeholder="Select payer"
+          />
         </Center>
+
+        {/* Split Options */}
         <Center>
           <Title size={25}>How to Split</Title>
         </Center>
@@ -119,10 +188,28 @@ const NewExpense = () => {
             <Text>Unequally</Text>
           </Flex>
         </Flex>
-        {openEqually && <SplitExpenseEqually amount={amount} user={paidTo} />}
-        {openUnequally && <SplitExpenseUnequally amount={amount} user={expense?.transaction.paidTo} />}
-        <Button variant="default" w={450}>
-          Save
+        {/* Split Components */}
+        {openEqually && <SplitExpenseEqually
+    amount={amount}
+    users={paidTo}
+    setPaidToUser={(updatedUsers) => setPaidToUser(updatedUsers)} // Pass correctly
+  />}
+        {openUnequally && (
+          <SplitExpenseUnequally
+            amount={amount}
+            users={paidTo}
+            setPaidToUser={(updatedUsers) => setPaidToUser(updatedUsers)} 
+          />
+        )}
+
+        {/* Save Button */}
+        <Button
+          variant="default"
+          w={450}
+          onClick={saveExpense}
+          disabled={loading}
+        >
+          {loading ? "Saving..." : "Save"}
         </Button>
       </Flex>
     </Box>

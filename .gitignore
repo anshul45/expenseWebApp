@@ -1,6 +1,3 @@
-/node_modules
-<<<<<<< HEAD
+
 .env
-=======
-.env
->>>>>>> 63a4279e741aa6667732260817423955d3451dd5
+node_modules

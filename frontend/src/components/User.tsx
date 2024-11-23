@@ -5,7 +5,6 @@ const User = ({data}:any) => {
  
   const navigate = useNavigate()
   const totalAmount = data?.transactions?.reduce((sum:any,transaction:any)=>{return sum+transaction.amount},0)
-
   return (
     <Flex justify="space-between" my={10} align="center" style={{cursor:"pointer"}} onClick={() => navigate("/expense/"+data._id)}>
         <Flex align="center" gap={10}>

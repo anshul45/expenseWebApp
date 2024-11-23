@@ -14,25 +14,27 @@ import Reward from './page/Reward.tsx'
 import { Provider } from 'react-redux'
 import store from './reduxStore/store.ts'
 
-const router = createBrowserRouter([{
-  path:"/",
-  element: <App/>,
-  children:[
-    {path :"/", element: <Home/>},
-    {path:"/new-expense/:id",element:<NewExpense/>},
-    {path:"/expense/:id", element:<ExpenseView/>},
-    {path:"/profile",element:<Profile/>},
-    {path:"/reward",element:<Reward/>}
-  ]
-}])
-
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      { path: "/", element: <Home /> },
+      { path: "/new-expense/:userId", element: <NewExpense /> }, //  userId for adding
+      { path: "/edit-expense/:transactionId", element: <NewExpense /> }, // transactionId for editing
+      { path: "/expense/:id", element: <ExpenseView /> },
+      { path: "/profile", element: <Profile /> },
+      { path: "/reward", element: <Reward /> },
+    ],
+  },
+]);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-    <MantineProvider theme={theme}>
-   <RouterProvider router={router}/>
-    </MantineProvider>
+      <MantineProvider theme={theme}>
+        <RouterProvider router={router} />
+      </MantineProvider>
     </Provider>
-  </StrictMode>,
-)
+  </StrictMode>
+);

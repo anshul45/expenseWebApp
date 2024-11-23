@@ -11,7 +11,6 @@ const SelectFriends = ({mode,open,setOpen}:any) => {
    
   const addUser = async () => {
     const res = await addExpenseUser("individual",selectedFriends[0]);
-  
     }
   const navigate = useNavigate()
  

@@ -17,6 +17,7 @@ interface ITransaction extends Document{
 interface IExpense extends Document{
     name:string;
     type:string;
+    users: string[],
     transactions:ITransaction[];
 }
 
@@ -47,6 +48,10 @@ const expenseSchema = new Schema<IExpense>({
     type: String, 
     enum: ['individual', 'group'],
     required: true 
+  },
+  users: {
+    type: [String], 
+    required: true, 
   },
    transactions:[transactionSchema]
 })

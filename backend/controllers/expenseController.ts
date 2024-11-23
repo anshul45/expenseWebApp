@@ -2,25 +2,31 @@ import { Request, Response } from "express";
 import Expense from "../db/models/expenseModel"
 
 
-export const addExpenseUser = async(req:Request, res:Response):Promise<Response> => {
-    const {name,type} = req.body
-
-    const newExpense = new Expense({
-        name,
-        type,
-        transactions:[],
-    })
-
-    
-    try{
-        const savedExpense = await newExpense.save();
-        return res.json({ message: "Expense user added successfully", expense: savedExpense });    
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({messsage:"Error Saving ExpenseUser", error:error.messsage})
+export const addExpenseUser = async (req: Request, res: Response): Promise<Response> => {
+    const { name, type, users } = req.body;
+  
+    if (!name || !type || (type === "group" && (!users || users.length === 0))) {
+      return res.status(400).json({ message: "Invalid input data" });
     }
-
-}
+  
+    const usersList = type === "individual" ? ["you", name] : users;
+  
+    const newExpense = new Expense({
+      name,
+      type,
+      users: usersList,
+      transactions: [],
+    });
+  
+    try {
+      const savedExpense = await newExpense.save();
+      return res.json({ message: "Expense user added successfully", expense: savedExpense });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Error Saving ExpenseUser", error: error.message });
+    }
+  };
+  
 
 
 
@@ -56,6 +62,51 @@ export const addExpense = async(req:Request, res:Response):Promise<Response> => 
 }
 
 
+export const editExpense = async (req: Request, res: Response): Promise<Response> => {
+  const { transactionId, desc, amount, paidBy, paidTo } = req.body;
+
+  if (!transactionId) {
+    return res.status(400).json({ message: "Transaction ID is required in the request body." });
+  }
+
+  try {
+    // Prepare dynamic update fields
+    const updateFields: any = {};
+    if (desc) updateFields["transactions.$.desc"] = desc;
+    if (amount) updateFields["transactions.$.amount"] = amount;
+    if (paidBy) updateFields["transactions.$.paidBy"] = paidBy;
+
+    // For nested `paidTo` updates, overwrite the entire array if provided
+    if (paidTo && Array.isArray(paidTo)) {
+      updateFields["transactions.$.paidTo"] = paidTo;
+    }
+
+    // Update transaction using array filters to match the specific transaction ID
+    const result = await Expense.updateOne(
+      { "transactions._id": transactionId },
+      { $set: updateFields }
+    );
+
+    // Handle cases where no documents are updated
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({
+        message: "Transaction not found. Ensure the transaction ID is correct.",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Transaction updated successfully.",
+      result,
+    });
+  } catch (error) {
+    console.error("Error editing expense:", error);
+    return res.status(500).json({
+      message: "Internal server error while updating the transaction.",
+      error: error.message,
+    });
+  }
+};
+
 
 export const getAllExpense = async(req:Request, res:Response):Promise<Response> => {
     try{
@@ -77,7 +128,7 @@ export const getAllExpense = async(req:Request, res:Response):Promise<Response> 
 }
 
 
-export const getSingleExpense = async(req:Request, res:Response):Promise<Response> => {
+export const getUserExpense = async(req:Request, res:Response):Promise<Response> => {
     try{
         const { id } = req.query;
 

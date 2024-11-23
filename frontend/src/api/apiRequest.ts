@@ -16,9 +16,9 @@ export const getallExpense = async (type: string) => {
 };
 
 
-export const getSingleExpense = async (id: string) => {
+export const getUserExpense = async (id: string) => {
     try {
-      const response = await axios.get(`${url}/getexpense`, {
+      const response = await axios.get(`${url}/getuserexpense`, {
         params: { id },  
       });
   
@@ -56,4 +56,52 @@ export const addExpenseUser = async (type: string, name: string) => {
     console.error("Error adding expense user:", error.response ? error.response.data : error.message);
     throw error;
   }
+}
+
+export const addExpense = async(id:string, desc:string, amount:number, paidBy:string, paidTo:any) =>{
+  try {
+    const response = await axios.post(`${url}/addExpense`, {
+      id, 
+      desc,
+      amount,
+      paidBy,
+      paidTo
+    });
+
+    return response.data;  
+}catch (error) {
+    console.error("Error adding expense user:", error.response ? error.response.data : error.message);
+    throw error;
+  }  
+  
+}
+
+export const editExpense = async(transactionId:string, desc:string, amount:number, paidBy:string, paidTo:any) =>{
+  try {
+    const response = await axios.post(`${url}/editExpense`, {
+      transactionId, 
+      desc,
+      amount,
+      paidBy,
+      paidTo
+    });
+
+    return response.message;  
+}catch (error) {
+    console.error("Error adding expense user:", error.response ? error.response.data : error.message);
+    throw error;
+  }  
+  
+}
+
+export const deleteExpense = async(transactionId:string) =>{
+  try {
+    const response = await axios.delete(`${url}/deleteexpense?transactionId=${transactionId}`);
+
+    return response.message;  
+}catch (error) {
+    console.error("Error adding expense user:", error.response ? error.response.data : error.message);
+    throw error;
+  }  
+  
 }

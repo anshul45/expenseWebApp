@@ -20,19 +20,18 @@ const SplitExpenseUnequallyUser = ({
   totalAmount,
 }: SplitExpenseUnequallyUserProps) => {
   const [value, setValue] = useState(amount || 0);
-  const [previousValue, setPreviousValue] = useState(value); // Save the previous value
 
   const handleChange = (newValue: number | undefined) => {
     const updatedValue = newValue || 0;
     const remainingAmount = totalAmount - restAmount + value;
 
     if (updatedValue > remainingAmount) {
-      alert(`You cannot exceed the total amount of ${totalAmount}. Remaining amount is ${remainingAmount}.`);
-      setValue(previousValue); // Revert to the previous valid value
+      alert(
+        `You cannot exceed the total amount of ${totalAmount}. Remaining amount is ${remainingAmount}.`
+      );
       return;
     }
 
-    setPreviousValue(value); // Update the previous value before changing
     setValue(updatedValue);
     onAmountChange(userId, updatedValue);
   };
@@ -41,8 +40,8 @@ const SplitExpenseUnequallyUser = ({
     <Flex justify="space-between" align="center" my={10} style={{ cursor: 'pointer' }}>
       <Flex align="center" gap={10}>
         <Image
-          w={35}
-          h={35}
+          width={35}
+          height={35}
           style={{ borderRadius: '100%' }}
           src="data:image/jpeg;base64,..."
           alt="user"

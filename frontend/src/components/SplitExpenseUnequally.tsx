@@ -8,17 +8,34 @@ type User = {
   amount: number;
 };
 
-const SplitExpenseUnequally = ({ user, amount }: { user: User[]; amount: number }) => {
+const SplitExpenseUnequally = ({
+  users,
+  amount,
+  setPaidToUser,
+}: {
+  users: string[];
+  amount: number;
+  setPaidToUser: (data: { name: string; amount: number }[]) => void;
+}) => {
+  const initialUsers = users.map((name, index) => ({ _id: String(index), name, amount: 0 }));
+  const [userList, setUserList] = useState<User[]>(initialUsers);
   const [restAmount, setRestAmount] = useState(0);
 
   const handleUserAmountChange = (userId: string, newAmount: number) => {
-    setRestAmount((prevRestAmount) => {
-      const otherUsersTotal = user
-        .filter((u) => u._id !== userId) // Exclude the current user
-        .reduce((sum, u) => sum + (u.amount || 0), 0); // Sum all other users' amounts
+    // Update the user's amount
+    const updatedUsers = userList.map((user) =>
+      user._id === userId ? { ...user, amount: newAmount } : user
+    );
 
-      return otherUsersTotal + newAmount;
-    });
+    setUserList(updatedUsers);
+
+    // Recalculate the total distributed amount
+    const newRestAmount = updatedUsers.reduce((sum, user) => sum + user.amount, 0);
+    setRestAmount(newRestAmount);
+
+    // Update the setPaidToUser state
+    const paidToUserData = updatedUsers.map(({ name, amount }) => ({ name, amount }));
+    setPaidToUser(paidToUserData);
   };
 
   return (
@@ -26,25 +43,23 @@ const SplitExpenseUnequally = ({ user, amount }: { user: User[]; amount: number 
       <Center>
         <Title size={20}>Split Expense Unequally</Title>
       </Center>
-      <Text mb={10}>Select which people owe an equal share</Text>
-      {user?.length ? (
-        user.map((u) => (
-          <SplitExpenseUnequallyUser
-            key={u._id}
-            userId={u._id}
-            userName={u.name}
-            amount={u.amount}
-            onAmountChange={handleUserAmountChange}
-            restAmount={restAmount}
-            totalAmount={amount}
-          />
-        ))
-      ) : (
-        <Text>No users to display</Text>
-      )}
-      <Flex justify="center" align="center" direction="column">
-        <Text>{restAmount} of {amount || 0}</Text>
-        <Text>{Math.abs(amount - restAmount)} left</Text>
+      <Text mb={10}>Select how much each person owes</Text>
+      {userList.map((user) => (
+        <SplitExpenseUnequallyUser
+          key={user._id}
+          userId={user._id}
+          userName={user.name}
+          amount={user.amount}
+          onAmountChange={handleUserAmountChange}
+          restAmount={restAmount}
+          totalAmount={amount}
+        />
+      ))}
+      <Flex justify="center" align="center" direction="column" mt={20}>
+        <Text>
+          Total Distributed: {restAmount} of {amount}
+        </Text>
+        <Text>{Math.abs(amount - restAmount)} left to distribute</Text>
       </Flex>
     </Box>
   );

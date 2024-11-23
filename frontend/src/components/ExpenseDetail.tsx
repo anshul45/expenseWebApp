@@ -3,26 +3,28 @@ import { IconPencil, IconTrash } from "@tabler/icons-react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getFullDate } from "../utils/dates"
+import { deleteExpense } from "../api/apiRequest"
 
-const ExpenseDetail = ({open, setOpen,data}:{open:boolean,setOpen: (value: boolean) => void,data:any,userId:string}) => {
+const ExpenseDetail = ({open,userId, setOpen,data}:{open:boolean,setOpen: (value: boolean) => void,data:any,userId:string}) => {
   const navigate = useNavigate();
   const[openDelete, setOpenDelete] = useState<boolean>(false);
 
-  const clickedYes = () => {
+  const clickedYes = async() => {
+    await deleteExpense(data._id);
     setOpenDelete(false)
     setOpen(false)
+    navigate("/expense/"+userId)
   }
 
-  console.log(data)
 
 
   
 
   return (
-    <Modal opened={open} onClose={()=>{setOpen(false)}} title={data.description}>
+    <Modal opened={open} onClose={setOpen} title={data.description}>
       <Box bg="green" px={8} py={5}> 
     <Box>
-      <ActionIcon onClick={()=> navigate("/new-expense/"+data._id)}> 
+      <ActionIcon onClick={()=> navigate("/edit-expense/"+data._id)}> 
 <IconPencil/>
       </ActionIcon>
       <ActionIcon ml={10} onClick={()=> setOpenDelete(true)}>

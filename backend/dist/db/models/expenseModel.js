@@ -46,6 +46,10 @@ const expenseSchema = new mongoose_1.Schema({
         enum: ['individual', 'group'],
         required: true
     },
+    users: {
+        type: [String],
+        required: true,
+    },
     transactions: [transactionSchema]
 });
 const Expense = mongoose_1.default.model("Expense", expenseSchema);

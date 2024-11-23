@@ -23,13 +23,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteExpense = exports.getTransactionById = exports.getSingleExpense = exports.getAllExpense = exports.addExpense = exports.addExpenseUser = void 0;
+exports.deleteExpense = exports.getTransactionById = exports.getUserExpense = exports.getAllExpense = exports.editExpense = exports.addExpense = exports.addExpenseUser = void 0;
 const expenseModel_1 = __importDefault(require("../db/models/expenseModel"));
 const addExpenseUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, type } = req.body;
+    const { name, type, users } = req.body;
+    if (!name || !type || (type === "group" && (!users || users.length === 0))) {
+        return res.status(400).json({ message: "Invalid input data" });
+    }
+    const usersList = type === "individual" ? ["you", name] : users;
     const newExpense = new expenseModel_1.default({
         name,
         type,
+        users: usersList,
         transactions: [],
     });
     try {
@@ -37,8 +42,8 @@ const addExpenseUser = (req, res) => __awaiter(void 0, void 0, void 0, function*
         return res.json({ message: "Expense user added successfully", expense: savedExpense });
     }
     catch (error) {
-        console.log(error);
-        res.status(500).json({ messsage: "Error Saving ExpenseUser", error: error.messsage });
+        console.error(error);
+        return res.status(500).json({ message: "Error Saving ExpenseUser", error: error.message });
     }
 });
 exports.addExpenseUser = addExpenseUser;
@@ -69,6 +74,46 @@ const addExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.addExpense = addExpense;
+const editExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { transactionId, desc, amount, paidBy, paidTo } = req.body;
+    if (!transactionId) {
+        return res.status(400).json({ message: "Transaction ID is required in the request body." });
+    }
+    try {
+        // Prepare dynamic update fields
+        const updateFields = {};
+        if (desc)
+            updateFields["transactions.$.desc"] = desc;
+        if (amount)
+            updateFields["transactions.$.amount"] = amount;
+        if (paidBy)
+            updateFields["transactions.$.paidBy"] = paidBy;
+        // For nested `paidTo` updates, overwrite the entire array if provided
+        if (paidTo && Array.isArray(paidTo)) {
+            updateFields["transactions.$.paidTo"] = paidTo;
+        }
+        // Update transaction using array filters to match the specific transaction ID
+        const result = yield expenseModel_1.default.updateOne({ "transactions._id": transactionId }, { $set: updateFields });
+        // Handle cases where no documents are updated
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({
+                message: "Transaction not found. Ensure the transaction ID is correct.",
+            });
+        }
+        return res.status(200).json({
+            message: "Transaction updated successfully.",
+            result,
+        });
+    }
+    catch (error) {
+        console.error("Error editing expense:", error);
+        return res.status(500).json({
+            message: "Internal server error while updating the transaction.",
+            error: error.message,
+        });
+    }
+});
+exports.editExpense = editExpense;
 const getAllExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { type } = req.query;
@@ -85,7 +130,7 @@ const getAllExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.getAllExpense = getAllExpense;
-const getSingleExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.query;
         // Check if 'type' is passed in the query string
@@ -100,7 +145,7 @@ const getSingleExpense = (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.status(500).json({ message: "Error retrieving expenses", error: error.message });
     }
 });
-exports.getSingleExpense = getSingleExpense;
+exports.getUserExpense = getUserExpense;
 const getTransactionById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { transactionId } = req.query;
