@@ -2,7 +2,7 @@ import { Flex, Image, Text } from "@mantine/core"
 import { useNavigate } from "react-router-dom"
 
 const User = ({data}:any) => {
- 
+
   const navigate = useNavigate()
   const totalAmount = data?.transactions?.reduce((sum:any,transaction:any)=>{return sum+transaction.amount},0)
   return (

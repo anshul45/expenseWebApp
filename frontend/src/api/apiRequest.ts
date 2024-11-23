@@ -44,11 +44,15 @@ export const getUserExpense = async (id: string) => {
   };
 
 
-export const addExpenseUser = async (type: string, name: string) => {
+export const addExpenseUser = async (type: string, users: string[]) => {
+ const name = users[0];
+
+  if(type === "individual") users = [];
   try {
     const response = await axios.post(`${url}/addExpenseUser`, {
       name, 
-      type
+      type,
+      users
     });
 
     return response.data;  

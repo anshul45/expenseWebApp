@@ -27,10 +27,29 @@ exports.deleteExpense = exports.getTransactionById = exports.getUserExpense = ex
 const expenseModel_1 = __importDefault(require("../db/models/expenseModel"));
 const addExpenseUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, type, users } = req.body;
-    if (!name || !type || (type === "group" && (!users || users.length === 0))) {
-        return res.status(400).json({ message: "Invalid input data" });
+    // Validation checks
+    if (!name || !type) {
+        return res.status(400).json({ message: "Invalid input data: name and type are required" });
     }
-    const usersList = type === "individual" ? ["you", name] : users;
+    if (type === "individual") {
+        if (!name) {
+            return res.status(400).json({
+                message: "Invalid input data: For 'individual', exactly one friend must be provided",
+            });
+        }
+    }
+    else if (type === "group") {
+        if (!users || users.length === 0) {
+            return res.status(400).json({
+                message: "Invalid input data: For 'group', at least one user must be provided",
+            });
+        }
+    }
+    else {
+        return res.status(400).json({ message: "Invalid input data: Type must be 'individual' or 'group'" });
+    }
+    const usersList = type === "individual" ? ["you", name] : ["you", ...users];
+    // Create a new Expense
     const newExpense = new expenseModel_1.default({
         name,
         type,
@@ -43,7 +62,7 @@ const addExpenseUser = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error Saving ExpenseUser", error: error.message });
+        return res.status(500).json({ message: "Error saving ExpenseUser", error: error.message });
     }
 });
 exports.addExpenseUser = addExpenseUser;

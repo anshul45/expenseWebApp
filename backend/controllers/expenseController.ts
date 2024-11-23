@@ -3,31 +3,47 @@ import Expense from "../db/models/expenseModel"
 
 
 export const addExpenseUser = async (req: Request, res: Response): Promise<Response> => {
-    const { name, type, users } = req.body;
-  
-    if (!name || !type || (type === "group" && (!users || users.length === 0))) {
-      return res.status(400).json({ message: "Invalid input data" });
-    }
-  
-    const usersList = type === "individual" ? ["you", name] : users;
-  
-    const newExpense = new Expense({
-      name,
-      type,
-      users: usersList,
-      transactions: [],
-    });
-  
-    try {
-      const savedExpense = await newExpense.save();
-      return res.json({ message: "Expense user added successfully", expense: savedExpense });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Error Saving ExpenseUser", error: error.message });
-    }
-  };
-  
+  const { name, type, users } = req.body;
 
+  // Validation checks
+  if (!name || !type) {
+    return res.status(400).json({ message: "Invalid input data: name and type are required" });
+  }
+
+  if (type === "individual") {
+    if (!name) {
+      return res.status(400).json({
+        message: "Invalid input data: For 'individual', exactly one friend must be provided",
+      });
+    }
+  } else if (type === "group") {
+    if (!users || users.length === 0) {
+      return res.status(400).json({
+        message: "Invalid input data: For 'group', at least one user must be provided",
+      });
+    }
+  } else {
+    return res.status(400).json({ message: "Invalid input data: Type must be 'individual' or 'group'" });
+  }
+  
+  const usersList = type === "individual" ? ["you", name] : ["you", ...users];
+
+  // Create a new Expense
+  const newExpense = new Expense({
+    name,
+    type,
+    users: usersList,
+    transactions: [],
+  });
+
+  try {
+    const savedExpense = await newExpense.save();
+    return res.json({ message: "Expense user added successfully", expense: savedExpense });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error saving ExpenseUser", error: error.message });
+  }
+};
 
 
 export const addExpense = async(req:Request, res:Response):Promise<Response> => {

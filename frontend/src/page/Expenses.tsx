@@ -7,7 +7,7 @@ import { useState } from "react"
 const Expenses = ({title,expenseData}:any) => {
   const [open,setOpen] = useState<boolean>(false)
   return (
-    <Box py={10} px={15} style={{flex:0.5}}>
+    <Box py={10} px={15} h={505} style={{flex:0.5, overflowY:"scroll",scrollbarColor:"inherit"}}>
       <Flex justify="space-between" h="100%" direction="column">
         <Box>
       <Center w="100%">
