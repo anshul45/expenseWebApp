@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteExpense = exports.getTransactionById = exports.getUserExpense = exports.getAllExpense = exports.editExpense = exports.addExpense = exports.addExpenseUser = void 0;
+exports.deleteUser = exports.deleteExpense = exports.getTransactionById = exports.getUserExpense = exports.getAllExpense = exports.editExpense = exports.addExpense = exports.addExpenseUser = void 0;
 const expenseModel_1 = __importDefault(require("../db/models/expenseModel"));
 const addExpenseUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, type, users } = req.body;
@@ -210,3 +210,23 @@ const deleteExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.deleteExpense = deleteExpense;
+const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.query;
+    if (!id) {
+        return res.status(400).json({ message: "userId ID is required in the query parameters." });
+    }
+    try {
+        // Find and update the expense by removing the specific transaction
+        const result = yield expenseModel_1.default.findByIdAndDelete(id);
+        if (result.modifiedCount === 0) {
+            // No transaction found or removed
+            return res.status(404).json({ message: "user not found." });
+        }
+        return res.status(200).json({ message: "user deleted successfully." });
+    }
+    catch (error) {
+        console.error("Error deleting user:", error);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+});
+exports.deleteUser = deleteUser;

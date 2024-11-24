@@ -1,25 +1,22 @@
-import { Box, Button, Center, Flex, Modal, Text } from "@mantine/core"
-import User from "./User"
+import { Button, Flex, Modal } from "@mantine/core"
 import { useNavigate } from "react-router-dom"
+import { deleteExpense } from "../api/apiRequest"
 
-const SettleUp = ({openSettleUp, setOpenSettleUp}:any) => {
+const SettleUp = ({userId,openSettleUp,transactionIds, setOpenSettleUp}:any) => {
     const navigate = useNavigate()
-    const handleClick = () => {
-        setOpenSettleUp(false)
-        navigate("/expense/1")
+    const handleClick = async() => {
+      await Promise.all(transactionIds.map((id) => deleteExpense(id)));
+      setOpenSettleUp(false)
+        navigate("/expense/"+userId)
     }
+
+
   return (
-    <Modal opened={openSettleUp} onClose={() =>{setOpenSettleUp(false)} } title="Settle Payment">
-        <Flex justify="space-between">
-            <Text>You receive</Text>
-            <Text>amount</Text>
-        </Flex>
-        <Box mx={15}>
-    <User/>
-        </Box>
-<Center mt={20}>
-        <Button onClick={handleClick}>Settle</Button>
-</Center>
+    <Modal opened={openSettleUp} onClose={() =>{setOpenSettleUp(false)} }  title="Do you want to delete this expense">
+     <Flex justify="space-between">
+      <Button onClick={handleClick}>Yes</Button>
+      <Button onClick={() => setOpenSettleUp(false)}>No</Button>
+     </Flex>
     </Modal>
   )
 }

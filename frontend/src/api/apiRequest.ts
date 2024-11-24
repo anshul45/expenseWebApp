@@ -109,3 +109,16 @@ export const deleteExpense = async(transactionId:string) =>{
   }  
   
 }
+
+
+export const deleteUser = async(id:string) =>{
+  try {
+    const response = await axios.delete(`${url}/deleteuser?id=${id}`);
+
+    return response.message;  
+}catch (error) {
+    console.error("Error adding expense user:", error.response ? error.response.data : error.message);
+    throw error;
+  }  
+  
+}

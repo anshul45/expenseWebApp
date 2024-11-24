@@ -13,4 +13,5 @@ expenseRouter.get("/getexpenses", expenseController_1.getAllExpense);
 expenseRouter.get("/getuserexpense", expenseController_1.getUserExpense);
 expenseRouter.get("/getSingleTransaction", expenseController_1.getTransactionById);
 expenseRouter.delete("/deleteexpense", expenseController_1.deleteExpense);
+expenseRouter.delete("/deleteUser", expenseController_1.deleteUser);
 exports.default = expenseRouter;

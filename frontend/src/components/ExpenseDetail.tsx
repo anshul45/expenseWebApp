@@ -16,10 +16,6 @@ const ExpenseDetail = ({open,userId, setOpen,data}:{open:boolean,setOpen: (value
     navigate("/expense/"+userId)
   }
 
-
-
-  
-
   return (
     <Modal opened={open} onClose={setOpen} title={data.description}>
       <Box bg="green" px={8} py={5}> 

@@ -1,10 +1,12 @@
 import { Flex, Image, Text } from '@mantine/core'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ExpenseDetail from './ExpenseDetail'
 import { getMonth, getMonthString } from '../utils/dates'
+import { ownAmount } from '../utils/amount';
 
-const ExpenseCart = ({ data, userId }: any) => {
+const ExpenseCart = ({ data, userId, setOwe }: any) => {
   const [open, setOpen] = useState<boolean>(false);
+  const [amount,setAmount] = useState<number>(null);
 
   const handleOpen = (e: React.MouseEvent) => {
     if (!open) {
@@ -17,6 +19,14 @@ const ExpenseCart = ({ data, userId }: any) => {
     setOpen(false);
   };
 
+  useEffect(()=> {
+    const res = ownAmount(data)
+    
+    setAmount(res)
+
+    if(amount) setOwe(prev => prev+= amount)
+  },[data])
+  
 
   return (
     <Flex
@@ -42,7 +52,7 @@ const ExpenseCart = ({ data, userId }: any) => {
         />
         <Text ml={35}>{data.description}</Text>
       </Flex>
-      <Text>${data.amount}</Text>
+      <Text>{amount<0 ? "-$ ":"$ "}{Math.abs(amount)}</Text>
       <ExpenseDetail open={open} setOpen={handleClose} data={data} userId={userId} />
     </Flex>
   );

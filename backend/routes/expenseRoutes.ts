@@ -1,5 +1,5 @@
 import express,{Request, Response} from "express"
-import { addExpenseUser,addExpense, getAllExpense, getTransactionById,deleteExpense, getUserExpense, editExpense } from "../controllers/expenseController"
+import { addExpenseUser,addExpense, getAllExpense, getTransactionById,deleteExpense, getUserExpense, editExpense, deleteUser } from "../controllers/expenseController"
 
 const expenseRouter =  express.Router()
 
@@ -11,5 +11,6 @@ expenseRouter.get("/getexpenses", getAllExpense)
 expenseRouter.get("/getuserexpense", getUserExpense)
 expenseRouter.get("/getSingleTransaction",getTransactionById)
 expenseRouter.delete("/deleteexpense",deleteExpense)
+expenseRouter.delete("/deleteUser",deleteUser)
 
 export default expenseRouter

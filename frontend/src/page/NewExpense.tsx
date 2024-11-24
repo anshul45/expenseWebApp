@@ -108,7 +108,7 @@ const NewExpense = () => {
       <Flex gap={10} mb={40} align="center">
         <ActionIcon
           onClick={() =>
-            navigate(transactionId ? `/expense/${expense?._id}` : "/")
+            navigate(`/expense/${expense?._id}`)
           }
         >
           <IconArrowLeftDashed />
