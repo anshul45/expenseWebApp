@@ -23,6 +23,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getSingleTransaction, getUserExpense, addExpense, editExpense } from "../api/apiRequest";
 
+interface User {
+  name: string;
+  amount: number;
+}
+
 const NewExpense = () => {
   const navigate = useNavigate();
   const { transactionId, userId } = useParams();
@@ -36,7 +41,7 @@ const NewExpense = () => {
   const [amount, setAmount] = useState<number | undefined>();
   const [paidBy, setPaidBy] = useState<string>("you");
   const [paidTo, setPaidTo] = useState<string[]>([]);
-  const [paidToUser, setPaidToUser] = useState([]);
+  const [paidToUser, setPaidToUser] = useState<User[]>([]);
 
   // Fetch user expense by ID
   const fetchUserExpense = async (userId: string) => {
@@ -105,7 +110,7 @@ const NewExpense = () => {
 
   return (
     <Box px={40} py={15} w="100%">
-      <Flex gap={10} mb={40} align="center">
+      <Flex gap={10} mb={30} align="center">
         <ActionIcon
           onClick={() =>
             navigate(`/expense/${expense?._id}`)
@@ -139,7 +144,7 @@ const NewExpense = () => {
             w={300}
             placeholder="Amount"
             value={amount}
-            onChange={setAmount}
+            onChange={(value) => setAmount(value !== '' ? Number(value) : undefined)}
             hideControls
           />
         </Flex>
@@ -151,7 +156,7 @@ const NewExpense = () => {
             w={170}
             value={paidBy}
             data={paidTo}
-            onChange={setPaidBy}
+            onChange={(value: string | null) => setPaidBy(value || "")}
             placeholder="Select payer"
           />
         </Center>
@@ -188,19 +193,22 @@ const NewExpense = () => {
             <Text>Unequally</Text>
           </Flex>
         </Flex>
+
         {/* Split Components */}
+        <Box h={205} style={{overflowY:"scroll", scrollbarWidth:"none"}}>
         {openEqually && <SplitExpenseEqually
-    amount={amount}
+    amount={amount ?? 0}
     users={paidTo}
-    setPaidToUser={(updatedUsers) => setPaidToUser(updatedUsers)} // Pass correctly
+    setPaidToUser={(updatedUsers) => setPaidToUser(updatedUsers)} 
   />}
         {openUnequally && (
           <SplitExpenseUnequally
-            amount={amount}
+            amount={amount ?? 0}
             users={paidTo}
             setPaidToUser={(updatedUsers) => setPaidToUser(updatedUsers)} 
           />
         )}
+</Box>
 
         {/* Save Button */}
         <Button

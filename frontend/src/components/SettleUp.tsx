@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom"
 import { deleteExpense } from "../api/apiRequest"
 
 const SettleUp = ({userId,openSettleUp,transactionIds, setOpenSettleUp}:any) => {
+
     const navigate = useNavigate()
     const handleClick = async() => {
-      await Promise.all(transactionIds.map((id) => deleteExpense(id)));
+      await Promise.all(transactionIds.map((id:string) => deleteExpense(id)));
       setOpenSettleUp(false)
         navigate("/expense/"+userId)
     }

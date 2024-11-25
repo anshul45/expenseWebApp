@@ -1,10 +1,11 @@
 import { Center, Title } from '@mantine/core'
 
 const Reward = () => {
+
   return (
     <Center w="100%">
         <Title size={30}>
-        Coming Soon...
+        Reward Coming Soon...
         </Title>
         </Center>
   )

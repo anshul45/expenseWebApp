@@ -2,12 +2,14 @@ import { Box, Center, Flex, Text } from "@mantine/core"
 import User from "../components/User"
 import { IconPencilPlus } from "@tabler/icons-react"
 import SelectFriends from "../components/SelectFriends"
-import { useState } from "react"
+import React, { useState } from "react"
+import { ExpensesProps } from "../utils/types"
 
-const Expenses = ({title,expenseData}:any) => {
+const Expenses:React.FC<ExpensesProps> = ({title,expenseData,refreshData}) => {
   const [open,setOpen] = useState<boolean>(false)
+
   return (
-    <Box py={10} px={15} h={505} style={{flex:0.5, overflowY:"scroll",scrollbarColor:"inherit"}}>
+    <Box py={10} px={15} h={525} style={{flex:0.5}}>
       <Flex justify="space-between" h="100%" direction="column">
         <Box>
       <Center w="100%">
@@ -15,17 +17,19 @@ const Expenses = ({title,expenseData}:any) => {
         {title}
         </Text>
       </Center>
-      {expenseData?.map((data,idx)=>(
+      <Box h={430} px={10} style={{overflowY:"scroll", scrollbarWidth: "none"}}>
+      {expenseData?.map((data,idx:number)=>(
       
       <User data={data} key={idx}/>
       ))}
+      </Box>
         </Box>
         <Center w="100%" style={{cursor:"pointer"}} onClick={() =>setOpen(true)}>
         <IconPencilPlus/> 
       <Text size="sm" ml={7}> Add expense</Text>
         </Center>
       </Flex>
-      <SelectFriends mode={title} open={open} setOpen={setOpen}/>
+      <SelectFriends mode={title} open={open} setOpen={setOpen} refreshData={refreshData}/>
     </Box>
   )
 }

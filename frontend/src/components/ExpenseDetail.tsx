@@ -4,21 +4,33 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getFullDate } from "../utils/dates"
 import { deleteExpense } from "../api/apiRequest"
+import { Transaction } from "../utils/types"
 
-const ExpenseDetail = ({open,userId, setOpen,data}:{open:boolean,setOpen: (value: boolean) => void,data:any,userId:string}) => {
+interface ExpenseDetailProps {
+  refreshData: any;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>> 
+  data: Transaction;
+}
+
+const ExpenseDetail :React.FC<ExpenseDetailProps> = ({refreshData, open, setOpen,data}) => {
   const navigate = useNavigate();
   const[openDelete, setOpenDelete] = useState<boolean>(false);
+
+  console.log(data)
 
   const clickedYes = async() => {
     await deleteExpense(data._id);
     setOpenDelete(false)
     setOpen(false)
-    navigate("/expense/"+userId)
+    await refreshData()
   }
 
+
+
   return (
-    <Modal opened={open} onClose={setOpen} title={data.description}>
-      <Box bg="green" px={8} py={5}> 
+    <Modal opened={open} onClose={() =>setOpen(false)} title={"previewing " + data.desc}>
+      <Box px={8} py={5}> 
     <Box>
       <ActionIcon onClick={()=> navigate("/edit-expense/"+data._id)}> 
 <IconPencil/>

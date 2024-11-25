@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import { MantineProvider } from '@mantine/core'
 import App from './App.tsx'
 import './index.css'
-import { theme } from './theme.ts'
 import '@mantine/core/styles.css';
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import Home from './page/Home.tsx'
@@ -13,6 +12,7 @@ import Profile from './page/Profile.tsx'
 import Reward from './page/Reward.tsx'
 import { Provider } from 'react-redux'
 import store from './reduxStore/store.ts'
+import { theme } from './theme.ts'
 
 const router = createBrowserRouter([
   {
@@ -29,10 +29,13 @@ const router = createBrowserRouter([
   },
 ]);
 
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-      <MantineProvider theme={theme}>
+      <MantineProvider 
+      theme={theme}
+      >
         <RouterProvider router={router} />
       </MantineProvider>
     </Provider>

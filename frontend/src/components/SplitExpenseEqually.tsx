@@ -11,6 +11,7 @@ const SplitExpenseEqually = ({
   amount: number;
   setPaidToUser: (updatedUsers: { name: string; amount: number }[]) => void;
 }) => {
+
   const [selectedUsers, setSelectedUsers] = useState<string[]>(users);
 
   const toggleUserSelection = (userName: string) => {

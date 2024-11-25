@@ -1,9 +1,11 @@
 import { ActionIcon, Box, Center, Flex, Input, Modal, Text } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { addExpenseUser } from "../api/apiRequest";
+import { SelectFriendsProps } from "../utils/types";
 
-const SelectFriends = ({ mode, open, setOpen }: any) => {
+const SelectFriends:React.FC<SelectFriendsProps> = ({ mode, open, setOpen, refreshData }) => {
+
   const [inputFriend, setInputFriends] = useState("");
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
 
@@ -43,6 +45,7 @@ const SelectFriends = ({ mode, open, setOpen }: any) => {
   const handleSubmit = async () => {
     await addUser();
     setOpen(false); // Close the modal after submission
+    await refreshData();
   };
 
   return (

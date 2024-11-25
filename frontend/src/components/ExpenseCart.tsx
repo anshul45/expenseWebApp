@@ -3,10 +3,18 @@ import { useEffect, useState } from 'react'
 import ExpenseDetail from './ExpenseDetail'
 import { getMonth, getMonthString } from '../utils/dates'
 import { ownAmount } from '../utils/amount';
+import { Transaction } from '../utils/types';
 
-const ExpenseCart = ({ data, userId, setOwe }: any) => {
+interface ExpenseCartProps{
+  refreshData: any,
+  data: Transaction,
+  name:string,
+  setOwe :React.Dispatch<React.SetStateAction<number>> 
+}
+
+const ExpenseCart:React.FC<ExpenseCartProps> = ({refreshData, data,name, setOwe }) => {
   const [open, setOpen] = useState<boolean>(false);
-  const [amount,setAmount] = useState<number>(null);
+  const [amount,setAmount] = useState<number>(0);
 
   const handleOpen = (e: React.MouseEvent) => {
     if (!open) {
@@ -26,6 +34,7 @@ const ExpenseCart = ({ data, userId, setOwe }: any) => {
 
     if(amount) setOwe(prev => prev+= amount)
   },[data])
+
   
 
   return (
@@ -33,10 +42,10 @@ const ExpenseCart = ({ data, userId, setOwe }: any) => {
       align="center"
       justify="space-between"
       style={{ cursor: "pointer" }}
-      w={500}
+      w={400}
       onClick={handleOpen}
     >
-      <Flex align="center" gap={20}>
+      <Flex align="center" gap={10}>
         <Flex direction="column" align="center">
           <Text size="sm" style={{ lineHeight: "13px" }}>
             {getMonthString(data.createDate)}
@@ -48,12 +57,13 @@ const ExpenseCart = ({ data, userId, setOwe }: any) => {
         <Image
           w={40}
           style={{ borderRadius: "100%" }}
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWJaa44hakF5skS3g1dAqjMEuMAR6MgAetFw&s"
+          src={`https://avatar.iran.liara.run/public?username=${name}`}
         />
-        <Text ml={35}>{data.description}</Text>
+        <Text ml={35}>{data.desc}</Text>
       </Flex>
-      <Text>{amount<0 ? "-$ ":"$ "}{Math.abs(amount)}</Text>
-      <ExpenseDetail open={open} setOpen={handleClose} data={data} userId={userId} />
+      <Text c={amount<0 ? "red":"green"}>{amount<0 ? "-$ ":"$ "}{Math.abs(amount)}</Text>
+      
+      <ExpenseDetail refreshData={refreshData} open={open} setOpen={handleClose} data={data}/>
     </Flex>
   );
 };

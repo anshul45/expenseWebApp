@@ -5,7 +5,6 @@ import { useState } from 'react';
 type SplitExpenseUnequallyUserProps = {
   userId: string;
   userName: string;
-  amount: number;
   onAmountChange: (userId: string, newAmount: number) => void;
   restAmount: number;
   totalAmount: number;
@@ -14,16 +13,15 @@ type SplitExpenseUnequallyUserProps = {
 const SplitExpenseUnequallyUser = ({
   userId,
   userName,
-  amount,
   onAmountChange,
   restAmount,
   totalAmount,
 }: SplitExpenseUnequallyUserProps) => {
-  const [value, setValue] = useState(amount || 0);
+  const [value, setValue] = useState<number|undefined>();
 
-  const handleChange = (newValue: number | undefined) => {
-    const updatedValue = newValue || 0;
-    const remainingAmount = totalAmount - restAmount + value;
+  const handleChange = (newValue: number | string) => {
+    const updatedValue = typeof newValue === 'string' ? parseFloat(newValue) : newValue;
+    const remainingAmount = totalAmount - restAmount + (value ?? 0);
 
     if (updatedValue > remainingAmount) {
       alert(
@@ -36,6 +34,7 @@ const SplitExpenseUnequallyUser = ({
     onAmountChange(userId, updatedValue);
   };
 
+
   return (
     <Flex justify="space-between" align="center" my={10} style={{ cursor: 'pointer' }}>
       <Flex align="center" gap={10}>
@@ -43,17 +42,19 @@ const SplitExpenseUnequallyUser = ({
           width={35}
           height={35}
           style={{ borderRadius: '100%' }}
-          src="data:image/jpeg;base64,..."
+          src={`https://avatar.iran.liara.run/public?username=${userName}`}
           alt="user"
         />
         <span>{userName}</span>
       </Flex>
       <NumberInput
-        value={value}
-        onChange={handleChange}
+      w={130}
+      value={value}
+      onChange={handleChange}
+      /* @ts-ignore: */
         icon={<IconCurrencyRupee />}
         placeholder="Enter amount"
-        min={0}
+        hideControls
       />
     </Flex>
   );

@@ -9,20 +9,21 @@ const SplitExpenseEquallyUser = ({
   isSelected: boolean;
   onToggle: () => void;
 }) => {
+
   return (
     <Flex
       justify="space-between"
       align="center"
       my={10}
       onClick={onToggle}
-      sx={{ cursor: "pointer" }}
+      style={{ cursor: "pointer" }}
     >
       <Flex align="center" gap={10}>
         <Image
           width={35}
           height={35}
           radius="xl"
-          src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/..."
+          src={`https://avatar.iran.liara.run/public?username=${userName}`}
         />
         <Text>{userName}</Text>
       </Flex>

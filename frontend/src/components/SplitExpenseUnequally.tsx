@@ -19,7 +19,7 @@ const SplitExpenseUnequally = ({
 }) => {
   const initialUsers = users.map((name, index) => ({ _id: String(index), name, amount: 0 }));
   const [userList, setUserList] = useState<User[]>(initialUsers);
-  const [restAmount, setRestAmount] = useState(0);
+  const [restAmount, setRestAmount] = useState<number | undefined>(undefined);
 
   const handleUserAmountChange = (userId: string, newAmount: number) => {
     // Update the user's amount
@@ -38,6 +38,7 @@ const SplitExpenseUnequally = ({
     setPaidToUser(paidToUserData);
   };
 
+
   return (
     <Box>
       <Center>
@@ -49,9 +50,8 @@ const SplitExpenseUnequally = ({
           key={user._id}
           userId={user._id}
           userName={user.name}
-          amount={user.amount}
           onAmountChange={handleUserAmountChange}
-          restAmount={restAmount}
+          restAmount={restAmount ?? 0}
           totalAmount={amount}
         />
       ))}
@@ -59,7 +59,7 @@ const SplitExpenseUnequally = ({
         <Text>
           Total Distributed: {restAmount} of {amount}
         </Text>
-        <Text>{Math.abs(amount - restAmount)} left to distribute</Text>
+        <Text>{Math.abs(amount - (restAmount ?? 0))} left to distribute</Text>
       </Flex>
     </Box>
   );
