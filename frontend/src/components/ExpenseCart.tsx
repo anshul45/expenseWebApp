@@ -27,6 +27,8 @@ const ExpenseCart:React.FC<ExpenseCartProps> = ({refreshData, data,name, setOwe 
     setOpen(false);
   };
 
+console.log("data",data)
+
   useEffect(()=> {
     const res = ownAmount(data)
     
