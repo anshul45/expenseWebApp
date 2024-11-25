@@ -56,10 +56,18 @@ export const addExpenseUser = async (type: string, users: string[]) => {
     });
 
     return response.data;  
-}catch (error) {
-    console.error("Error adding expense user:", error.response ? error.response.data : error.message);
-    throw error;
+}catch (error: any) {  
+  if (error.response) {
+    
+    console.error("Error adding expense user:", error.response.data.message || error.response.data);
+    throw new Error(error.response.data.message || "An error occurred while adding the expense user.");
+  } else if (error.message) {
+ 
+    console.error("Error adding expense user:", error.message);
+    throw new Error(error.message);
   }
+  throw new Error("Unknown error occurred");
+}
 }
 
 export const addExpense = async(id:string, desc:string, amount:number, paidBy:string, paidTo:any) =>{
@@ -73,10 +81,18 @@ export const addExpense = async(id:string, desc:string, amount:number, paidBy:st
     });
 
     return response.data;  
-}catch (error) {
-    console.error("Error adding expense user:", error.response ? error.response.data : error.message);
-    throw error;
-  }  
+}catch (error: any) {  
+  if (error.response) {
+    
+    console.error("Error adding expense user:", error.response.data.message || error.response.data);
+    throw new Error(error.response.data.message || "An error occurred while adding the expense user.");
+  } else if (error.message) {
+ 
+    console.error("Error adding expense user:", error.message);
+    throw new Error(error.message);
+  }
+  throw new Error("Unknown error occurred");
+}
   
 }
 
@@ -90,11 +106,19 @@ export const editExpense = async(transactionId:string, desc:string, amount:numbe
       paidTo
     });
 
-    return response.message;  
-}catch (error) {
-    console.error("Error adding expense user:", error.response ? error.response.data : error.message);
-    throw error;
-  }  
+    return response.data.message;  
+}catch (error: any) {  
+  if (error.response) {
+    
+    console.error("Error adding expense user:", error.response.data.message || error.response.data);
+    throw new Error(error.response.data.message || "An error occurred while adding the expense user.");
+  } else if (error.message) {
+ 
+    console.error("Error adding expense user:", error.message);
+    throw new Error(error.message);
+  }
+  throw new Error("Unknown error occurred");
+}
   
 }
 
@@ -102,11 +126,19 @@ export const deleteExpense = async(transactionId:string) =>{
   try {
     const response = await axios.delete(`${url}/deleteexpense?transactionId=${transactionId}`);
 
-    return response.message;  
-}catch (error) {
-    console.error("Error adding expense user:", error.response ? error.response.data : error.message);
-    throw error;
-  }  
+    return response.data.message;  
+}catch (error: any) {  
+  if (error.response) {
+    
+    console.error("Error adding expense user:", error.response.data.message || error.response.data);
+    throw new Error(error.response.data.message || "An error occurred while adding the expense user.");
+  } else if (error.message) {
+ 
+    console.error("Error adding expense user:", error.message);
+    throw new Error(error.message);
+  }
+  throw new Error("Unknown error occurred");
+}
   
 }
 
@@ -115,10 +147,18 @@ export const deleteUser = async(id:string) =>{
   try {
     const response = await axios.delete(`${url}/deleteuser?id=${id}`);
 
-    return response.message;  
-}catch (error) {
-    console.error("Error adding expense user:", error.response ? error.response.data : error.message);
-    throw error;
-  }  
+    return response.data.message;  
+}catch (error: any) {  
+  if (error.response) {
+    
+    console.error("Error adding expense user:", error.response.data.message || error.response.data);
+    throw new Error(error.response.data.message || "An error occurred while adding the expense user.");
+  } else if (error.message) {
+ 
+    console.error("Error adding expense user:", error.message);
+    throw new Error(error.message);
+  }
+  throw new Error("Unknown error occurred");
+}
   
 }

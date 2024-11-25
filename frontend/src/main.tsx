@@ -10,8 +10,6 @@ import NewExpense from './page/NewExpense.tsx'
 import ExpenseView from './page/ExpenseView.tsx'
 import Profile from './page/Profile.tsx'
 import Reward from './page/Reward.tsx'
-import { Provider } from 'react-redux'
-import store from './reduxStore/store.ts'
 import { theme } from './theme.ts'
 
 const router = createBrowserRouter([
@@ -32,12 +30,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Provider store={store}>
       <MantineProvider 
       theme={theme}
       >
         <RouterProvider router={router} />
       </MantineProvider>
-    </Provider>
   </StrictMode>
 );
