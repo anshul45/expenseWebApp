@@ -62,7 +62,7 @@ const SplitExpenseUnequally = ({
         <Text>
           Total Distributed: {restAmount ? restAmount : 0} of {amount}
         </Text>
-        <Text>{restAmount ?? 0 > amount ? 0 :Math.abs(amount - (restAmount ? restAmount: 0))} left to distribute</Text>
+        <Text>{(amount - (restAmount ? restAmount: 0))} left to distribute</Text>
       </Flex>
     </Box>
   );

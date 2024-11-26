@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "http://localhost:3001/api";
+const url = "https://expensewebapp.onrender.com/api";
 
 export const getallExpense = async (type: string) => {
   try {
