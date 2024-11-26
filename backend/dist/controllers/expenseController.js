@@ -62,34 +62,44 @@ const addExpenseUser = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error saving ExpenseUser", error: error.message });
+        return res.status(500).json({
+            message: "Error saving ExpenseUser",
+            error: error instanceof Error ? error.message : "Unknown error",
+        });
     }
 });
 exports.addExpenseUser = addExpenseUser;
 const addExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id, desc, amount, paidBy, paidTo } = req.body;
-    console.log(id);
     try {
         const expense = yield expenseModel_1.default.findById(id);
-        if (!expense)
-            res.status(403).json({ messsage: "ExpenseUser doesn't exist, First create user then only you can add expense!" });
+        if (!expense) {
+            return res.status(403).json({
+                message: "ExpenseUser doesn't exist. First create a user, then you can add expenses!",
+            });
+        }
+        // Directly create the new transaction object
         const newTransaction = {
             desc,
             amount,
             createDate: new Date(),
             paidBy,
-            paidTo
+            paidTo,
         };
-        expense === null || expense === void 0 ? void 0 : expense.transactions.push(newTransaction);
+        // Push the new transaction object to the transactions array
+        expense.transactions.push(newTransaction);
         yield expense.save();
         return res.status(200).json({
             message: "Expense added successfully",
-            expense: expense
+            expense,
         });
     }
     catch (error) {
-        console.log(error);
-        res.status(500).json({ messsage: "Error Saving Expense", error: error.messsage });
+        console.error(error);
+        return res.status(500).json({
+            message: "Error saving expense",
+            error: error instanceof Error ? error.message : "Unknown error",
+        });
     }
 });
 exports.addExpense = addExpense;
@@ -127,8 +137,8 @@ const editExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         console.error("Error editing expense:", error);
         return res.status(500).json({
-            message: "Internal server error while updating the transaction.",
-            error: error.message,
+            message: "Error while updating the transaction.",
+            error: error instanceof Error ? error.message : "Unknown error",
         });
     }
 });
@@ -138,30 +148,38 @@ const getAllExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const { type } = req.query;
         // Check if 'type' is passed in the query string
         if (!type) {
-            return res.status(400).json({ message: "Type is required in the query parameters." });
+            res.status(400).json({ message: "Type is required in the query parameters." });
+            return; // Ensure function ends here
         }
         const expense = yield expenseModel_1.default.find({ type });
-        res.status(201).json({ expense });
+        res.status(200).json({ expense });
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error retrieving expenses", error: error.message });
+        res.status(500).json({
+            message: "Error retrieving expenses",
+            error: error instanceof Error ? error.message : "Unknown error",
+        });
     }
 });
 exports.getAllExpense = getAllExpense;
 const getUserExpense = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.query;
-        // Check if 'type' is passed in the query string
+        // Check if 'id' is passed in the query string
         if (!id) {
             return res.status(400).json({ message: "Id is required in the query parameters." });
         }
         const expense = yield expenseModel_1.default.findById(id);
-        res.status(201).json({ expense });
+        // Return the expense 
+        return res.status(200).json({ expense });
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error retrieving expenses", error: error.message });
+        return res.status(500).json({
+            message: "Error retrieving expenses",
+            error: error instanceof Error ? error.message : "Unknown error",
+        });
     }
 });
 exports.getUserExpense = getUserExpense;
@@ -175,7 +193,9 @@ const getTransactionById = (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (!expense) {
             return res.status(404).json({ message: "Expense or transaction not found." });
         }
-        const transaction = expense.transactions.find((txn) => txn._id.toString() === transactionId);
+        const transaction = expense.transactions.find(
+        //@ts-ignore
+        (txn) => txn._id.toString() === transactionId);
         if (!transaction) {
             return res.status(404).json({ message: "Transaction not found in the expense." });
         }
@@ -184,7 +204,10 @@ const getTransactionById = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error retrieving transaction", error: error.message });
+        return res.status(500).json({
+            message: "Error retrieving transaction",
+            error: error instanceof Error ? error.message : "Unknown error",
+        });
     }
 });
 exports.getTransactionById = getTransactionById;
@@ -218,9 +241,9 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         // Find and update the expense by removing the specific transaction
         const result = yield expenseModel_1.default.findByIdAndDelete(id);
-        if (result.modifiedCount === 0) {
-            // No transaction found or removed
-            return res.status(404).json({ message: "user not found." });
+        if (!result) {
+            // No user found
+            return res.status(404).json({ message: "User not found." });
         }
         return res.status(200).json({ message: "user deleted successfully." });
     }

@@ -9,6 +9,7 @@ import {
   Center,
   Text,
   Button,
+  Alert,
 } from "@mantine/core";
 import {
   IconArrowLeftDashed,
@@ -16,6 +17,7 @@ import {
   IconCurrencyRupee,
   IconEqual,
   IconEqualNot,
+  IconAlertCircle,
 } from "@tabler/icons-react";
 import SplitExpenseEqually from "../components/SplitExpenseEqually";
 import SplitExpenseUnequally from "../components/SplitExpenseUnequally";
@@ -42,6 +44,38 @@ const NewExpense = () => {
   const [paidBy, setPaidBy] = useState<string>("you");
   const [paidTo, setPaidTo] = useState<string[]>([]);
   const [paidToUser, setPaidToUser] = useState<User[]>([]);
+   // State for alert
+   const [alert, setAlert] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
+
+  const showAlert = (title: string, message: string) => {
+    setAlert({ visible: true, title, message });
+    setTimeout(() => {
+      setAlert({ visible: false, title: "", message: "" });
+    }, 1000);
+  };
+
+
+  const handleSplitEqually = () => {
+    if (!desc || !amount) {
+      showAlert("Missing Details", "Please provide a description and amount to proceed.");
+      return;
+    }
+    setOpenUnequally(false);
+    setOpenEqually(true);
+  };
+
+  const handleSplitUnequally = () => {
+    if (!desc || !amount) {
+      showAlert("Missing Details", "Please provide a description and amount to proceed.");
+      return;
+    }
+    setOpenEqually(false);
+    setOpenUnequally(true);
+  };
 
   // Fetch user expense by ID
   const fetchUserExpense = async (userId: string) => {
@@ -74,10 +108,17 @@ const NewExpense = () => {
     }
   };
 
+  
+
   // Save expense details
   const saveExpense = async () => {
-    if (!desc || !amount || !paidBy ||!paidToUser) {
-      alert("Please fill in all fields before saving.");
+    const totalAmount = paidToUser.reduce((sum, item) => sum + item.amount, 0);
+    if (!desc || !amount || !paidBy ||!paidToUser.length) {
+      showAlert("Missing Fields", "Please fill in all fields before saving.");
+      return;
+    }
+    else if(amount !== totalAmount){
+      showAlert("Wrong Distribution", "Please distribute  all reamaning amount before saving.");
       return;
     }
     setLoading(true);
@@ -92,7 +133,7 @@ const NewExpense = () => {
       navigate(`/expense/${expense._id}`);
     } catch (error) {
       console.error("Error saving expense:", error);
-      alert("Failed to save expense. Please try again.");
+      showAlert("Save Failed", "Failed to save expense. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -110,6 +151,19 @@ const NewExpense = () => {
 
   return (
     <Box px={40} py={15} w="100%">
+       {/* Alert Component */}
+       {alert.visible && (
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title={alert.title}
+          color="red"
+          withCloseButton
+          onClose={() => setAlert({ visible: false, title: "", message: "" })}
+          mb={15}
+        >
+          {alert.message}
+        </Alert>
+      )}
       <Flex gap={10} mb={30} align="center">
         <ActionIcon
           onClick={() =>
@@ -169,10 +223,7 @@ const NewExpense = () => {
           <Flex
             direction="column"
             align="center"
-            onClick={() => {
-              setOpenUnequally(false);
-              setOpenEqually(true);
-            }}
+            onClick={handleSplitEqually}
           >
             <ActionIcon>
               <IconEqual />
@@ -182,10 +233,7 @@ const NewExpense = () => {
           <Flex
             direction="column"
             align="center"
-            onClick={() => {
-              setOpenEqually(false);
-              setOpenUnequally(true);
-            }}
+            onClick={handleSplitUnequally}
           >
             <ActionIcon>
               <IconEqualNot />
@@ -203,6 +251,7 @@ const NewExpense = () => {
   />}
         {openUnequally && (
           <SplitExpenseUnequally
+          showAlert={showAlert}
             amount={amount ?? 0}
             users={paidTo}
             setPaidToUser={(updatedUsers) => setPaidToUser(updatedUsers)} 

@@ -3,6 +3,7 @@ import { IconCurrencyRupee } from '@tabler/icons-react';
 import { useState } from 'react';
 
 type SplitExpenseUnequallyUserProps = {
+  showAlert: (title: string, message: string) => void;
   userId: string;
   userName: string;
   onAmountChange: (userId: string, newAmount: number) => void;
@@ -11,6 +12,7 @@ type SplitExpenseUnequallyUserProps = {
 };
 
 const SplitExpenseUnequallyUser = ({
+  showAlert,
   userId,
   userName,
   onAmountChange,
@@ -24,10 +26,9 @@ const SplitExpenseUnequallyUser = ({
     const remainingAmount = totalAmount - restAmount + (value ?? 0);
 
     if (updatedValue > remainingAmount) {
-      alert(
-        `You cannot exceed the total amount of ${totalAmount}. Remaining amount is ${remainingAmount}.`
+      showAlert(
+        "Missing Details", `You cannot exceed the total amount of ${totalAmount}. Remaining amount is ${remainingAmount}.`
       );
-      return;
     }
 
     setValue(updatedValue);

@@ -10,7 +10,39 @@ const SelectFriends:React.FC<SelectFriendsProps> = ({ mode, open, setOpen, refre
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
 
 
-  const friends = ["user1", "user2", "hello", "temp", "tempUser"];
+  const friends = [
+    "Aryan",
+    "Rohan",
+    "Aditya",
+    "Kabir",
+    "Aarav",
+    "Karan",
+    "Siddharth",
+    "Yash",
+    "Dev",
+    "Rajiv",
+    "Ananya",
+    "Riya",
+    "Priya",
+    "Nisha",
+    "Kavya",
+    "Meera",
+    "Sneha",
+    "Ishita",
+    "Diya",
+    "Pooja",
+    "Arjun",
+    "Sanjay",
+    "Manav",
+    "Akash",
+    "Neha",
+    "Simran",
+    "Tanya",
+    "Varun",
+    "Rajesh",
+    "Anjali"
+  ];
+  
   const filteredFriends = friends.filter((friend) =>
     friend.toLowerCase().includes(inputFriend.toLowerCase())
   );

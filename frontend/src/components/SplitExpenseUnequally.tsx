@@ -9,10 +9,12 @@ type User = {
 };
 
 const SplitExpenseUnequally = ({
+  showAlert,
   users,
   amount,
   setPaidToUser,
 }: {
+  showAlert: (title: string, message: string) => void;
   users: string[];
   amount: number;
   setPaidToUser: (data: { name: string; amount: number }[]) => void;
@@ -22,18 +24,18 @@ const SplitExpenseUnequally = ({
   const [restAmount, setRestAmount] = useState<number | undefined>(undefined);
 
   const handleUserAmountChange = (userId: string, newAmount: number) => {
-    // Update the user's amount
+   
     const updatedUsers = userList.map((user) =>
       user._id === userId ? { ...user, amount: newAmount } : user
     );
 
     setUserList(updatedUsers);
 
-    // Recalculate the total distributed amount
+
     const newRestAmount = updatedUsers.reduce((sum, user) => sum + user.amount, 0);
     setRestAmount(newRestAmount);
 
-    // Update the setPaidToUser state
+    
     const paidToUserData = updatedUsers.map(({ name, amount }) => ({ name, amount }));
     setPaidToUser(paidToUserData);
   };
@@ -47,6 +49,7 @@ const SplitExpenseUnequally = ({
       <Text mb={10}>Select how much each person owes</Text>
       {userList.map((user) => (
         <SplitExpenseUnequallyUser
+        showAlert={showAlert}
           key={user._id}
           userId={user._id}
           userName={user.name}
@@ -57,9 +60,9 @@ const SplitExpenseUnequally = ({
       ))}
       <Flex justify="center" align="center" direction="column" mt={20}>
         <Text>
-          Total Distributed: {restAmount} of {amount}
+          Total Distributed: {restAmount ? restAmount : 0} of {amount}
         </Text>
-        <Text>{Math.abs(amount - (restAmount ?? 0))} left to distribute</Text>
+        <Text>{restAmount ?? 0 > amount ? 0 :Math.abs(amount - (restAmount ? restAmount: 0))} left to distribute</Text>
       </Flex>
     </Box>
   );

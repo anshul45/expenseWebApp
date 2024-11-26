@@ -4,11 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "tsc": "tsc",
-    "nodemon": "nodemon dist/index.js",
-    "dev": "concurrently \"yarn run tsc -- --watch\" \"yarn run nodemon\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "tsc": "tsc",
+  "tsc:watch": "tsc --watch",
+  "nodemon": "nodemon --watch dist dist/index.js",
+  "dev": "concurrently \"yarn run tsc:watch\" \"yarn run nodemon\"",
+  "build": "tsc",
+  "start": "node dist/index.js",
+  "test": "echo \"Error: no test specified\" && exit 1"
+},
   "author": "",
   "description": "",
   "dependencies": {
