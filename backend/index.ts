@@ -16,7 +16,7 @@ app.get("/health", (req:Request,res:Response)=> {
     res.send('Server is healthy!')
 })
 
-const port = 3001
+const port = process.env.PORT || 4000;
 
 app.listen(port, ()=> {
 console.log(`Server is listening on port ${port}`)
